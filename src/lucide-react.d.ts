@@ -1,0 +1,47 @@
+declare module 'lucide-react' {
+  import type { ComponentType } from 'react'
+  type IconProps = { size?: number; strokeWidth?: number; className?: string }
+  export const ArrowDownToLine: ComponentType<IconProps>
+  export const ArrowUpFromLine: ComponentType<IconProps>
+  export const BarChart3: ComponentType<IconProps>
+  export const Bell: ComponentType<IconProps>
+  export const Box: ComponentType<IconProps>
+  export const Calculator: ComponentType<IconProps>
+  export const CalendarDays: ComponentType<IconProps>
+  export const Check: ComponentType<IconProps>
+  export const ChevronDown: ComponentType<IconProps>
+  export const CircleHelp: ComponentType<IconProps>
+  export const ClipboardList: ComponentType<IconProps>
+  export const CreditCard: ComponentType<IconProps>
+  export const DatabaseBackup: ComponentType<IconProps>
+  export const FileBarChart: ComponentType<IconProps>
+  export const FileText: ComponentType<IconProps>
+  export const Filter: ComponentType<IconProps>
+  export const HelpCircle: ComponentType<IconProps>
+  export const Home: ComponentType<IconProps>
+  export const LayoutGrid: ComponentType<IconProps>
+  export const LogOut: ComponentType<IconProps>
+  export const Menu: ComponentType<IconProps>
+  export const MoreHorizontal: ComponentType<IconProps>
+  export const Package: ComponentType<IconProps>
+  export const Palette: ComponentType<IconProps>
+  export const Plus: ComponentType<IconProps>
+  export const Printer: ComponentType<IconProps>
+  export const ReceiptText: ComponentType<IconProps>
+  export const Search: ComponentType<IconProps>
+  export const Settings: ComponentType<IconProps>
+  export const ShieldCheck: ComponentType<IconProps>
+  export const ShoppingCart: ComponentType<IconProps>
+  export const SlidersHorizontal: ComponentType<IconProps>
+  export const Sparkles: ComponentType<IconProps>
+  export const Store: ComponentType<IconProps>
+  export const Tag: ComponentType<IconProps>
+  export const Trash2: ComponentType<IconProps>
+  export const TrendingUp: ComponentType<IconProps>
+  export const Truck: ComponentType<IconProps>
+  export const UserPlus: ComponentType<IconProps>
+  export const Users: ComponentType<IconProps>
+  export const WalletCards: ComponentType<IconProps>
+  export const X: ComponentType<IconProps>
+  export const Zap: ComponentType<IconProps>
+}
