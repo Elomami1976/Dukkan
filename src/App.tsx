@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { ComponentType, FormEvent, ReactNode, CSSProperties } from 'react'
 import {
   ArrowDownToLine, ArrowUpFromLine, BarChart3, Bell, Box, Calculator, CalendarDays, Check, ChevronDown,
@@ -146,7 +146,71 @@ function Reports() { const reports = [{ icon: TrendingUp, title: 'تقرير ا�
 
 function UsersPage() { return <div className="page-content"><div className="toolbar"><div className="search-box"><Search size={18} /><input placeholder="ابحث عن مستخدم..." /></div><button className="btn primary"><UserPlus size={18} /> إضافة مستخدم</button></div><div className="card permissions-card"><div className="card-head"><div><h2>المستخدمون</h2><span>أدر صلاحيات الوصول إلى Dukkan</span></div></div><div className="user-row"><div className="avatar">ط</div><div className="user-details"><b>طارق العمامي</b><span>طارق • آخر دخول: الآن</span></div><span className="role admin">مدير النظام</span><span className="status success"><i /> نشط</span><button className="table-more"><MoreHorizontal size={18} /></button></div><div className="user-row"><div className="avatar cash">م</div><div className="user-details"><b>محمد سالم</b><span>m.salem • آخر دخول: أمس</span></div><span className="role">كاشير</span><span className="status success"><i /> نشط</span><button className="table-more"><MoreHorizontal size={18} /></button></div></div><div className="card role-card"><div className="card-head"><div><h2>الأدوار الافتراضية</h2><span>يمكن توسيع الصلاحيات لاحقاً</span></div></div><div className="role-list"><div><ShieldCheck size={20} /><b>مدير النظام</b><span>وصول كامل لكل أجزاء النظام والنسخ الاحتياطي</span></div><div><Calculator size={20} /><b>كاشير</b><span>نقطة البيع، المبيعات، العملاء ودفعات العملاء</span></div></div></div></div> }
 
-function SettingsPage({ notify }: { notify: (m: string) => void }) { const { business, updateBusiness } = useAppStore(); const [name, setName] = useState(business.name); return <div className="page-content settings-page"><div className="settings-layout"><aside className="settings-nav"><button className="selected"><Store size={17} /> بيانات النشاط</button><button><Palette size={17} /> الهوية والمظهر</button><button><SlidersHorizontal size={17} /> إعدادات النظام</button><button><DatabaseBackup size={17} /> النسخ الاحتياطي</button></aside><div className="settings-main"><section className="card settings-card"><div className="card-head"><div><h2>بيانات النشاط</h2><span>تظهر هذه البيانات على الفواتير والتقارير</span></div><button className="btn primary" onClick={() => { updateBusiness({ name }); notify('تم حفظ إعدادات النشاط') }}><Check size={17} /> حفظ التغييرات</button></div><div className="form-grid"><label className="full">اسم النشاط<input value={name} onChange={(e) => setName(e.target.value)} /></label><label>نوع النشاط<select defaultValue={business.type}><option>متجر تجزئة</option><option>جملة وتجزئة</option><option>مطعم ومقهى</option><option>خدمات</option></select></label><label>رقم الهاتف<input defaultValue={business.phone} /></label><label className="full">العنوان<input defaultValue={business.address} /></label><label className="full">الرقم الضريبي <small className="optional">اختياري</small><input defaultValue={business.taxNumber} placeholder="يمكن تركه فارغاً" /></label></div></section><section className="card settings-card"><div className="card-head"><div><h2>العملة واللغة</h2><span>الإعدادات المحلية لنشاطك</span></div></div><div className="settings-options"><div><b>العملة</b><span>الدينار الليبي (LYD)</span></div><div><b>الخانات العشرية</b><span>3 خانات — 1,250.000</span></div><div><b>لغة الواجهة</b><span>العربية — RTL</span></div></div></section><section className="card settings-card"><div className="card-head"><div><h2>النسخ الاحتياطي</h2><span>بياناتك محفوظة محلياً على هذا الجهاز</span></div></div><div className="backup-row"><div className="backup-symbol"><DatabaseBackup size={24} /></div><div><b>أنشئ نسخة احتياطية الآن</b><span>آخر نسخة احتياطية: اليوم، 09:10 ص</span></div><button className="btn secondary" onClick={() => notify('تم إنشاء النسخة الاحتياطية محلياً')}><DatabaseBackup size={16} /> إنشاء نسخة</button><button className="btn secondary"><ArrowUpFromLine size={16} /> استرجاع</button></div></section></div></div></div> }
+function SettingsPage({ notify }: { notify: (m: string) => void }) {
+  const { business, updateBusiness } = useAppStore()
+  const [name, setName] = useState(business.name)
+  const [lastBackup, setLastBackup] = useState('لم تُنشأ نسخة بعد')
+  const fileInput = useRef<HTMLInputElement>(null)
+
+  const createBackup = () => {
+    const state = useAppStore.getState()
+    const payload = {
+      format: 'Dukkan Backup',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      data: {
+        setupComplete: state.setupComplete,
+        business: state.business,
+        products: state.products,
+        customers: state.customers,
+        suppliers: state.suppliers,
+        sales: state.sales,
+        expenses: state.expenses,
+        categories: state.categories,
+        activeUser: state.activeUser,
+      },
+    }
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `Dukkan-Backup-${new Date().toISOString().slice(0, 10)}.json`
+    link.click()
+    URL.revokeObjectURL(url)
+    setLastBackup('الآن')
+    notify('تم تنزيل النسخة الاحتياطية بنجاح')
+  }
+
+  const restoreBackup = async (file?: File) => {
+    if (!file) return
+    try {
+      const parsed = JSON.parse(await file.text()) as { format?: unknown; data?: Record<string, unknown> }
+      const data = parsed.data
+      if (parsed.format !== 'Dukkan Backup' || !data || typeof data.business !== 'object' || !Array.isArray(data.products) || !Array.isArray(data.customers) || !Array.isArray(data.suppliers) || !Array.isArray(data.sales) || !Array.isArray(data.expenses) || !Array.isArray(data.categories)) {
+        throw new Error('invalid-backup')
+      }
+      useAppStore.setState({
+        setupComplete: Boolean(data.setupComplete),
+        business: data.business as Business,
+        products: data.products as Product[],
+        customers: data.customers as ReturnType<typeof useAppStore.getState>['customers'],
+        suppliers: data.suppliers as ReturnType<typeof useAppStore.getState>['suppliers'],
+        sales: data.sales as ReturnType<typeof useAppStore.getState>['sales'],
+        expenses: data.expenses as ReturnType<typeof useAppStore.getState>['expenses'],
+        categories: data.categories as string[],
+        activeUser: typeof data.activeUser === 'string' ? data.activeUser : 'مدير النظام',
+      })
+      notify('تم استرجاع البيانات، سيتم تحديث الواجهة')
+      window.setTimeout(() => window.location.reload(), 700)
+    } catch {
+      notify('ملف النسخة الاحتياطية غير صالح')
+    } finally {
+      if (fileInput.current) fileInput.current.value = ''
+    }
+  }
+
+  return <div className="page-content settings-page"><div className="settings-layout"><aside className="settings-nav"><button className="selected"><Store size={17} /> بيانات النشاط</button><button><Palette size={17} /> الهوية والمظهر</button><button><SlidersHorizontal size={17} /> إعدادات النظام</button><button><DatabaseBackup size={17} /> النسخ الاحتياطي</button></aside><div className="settings-main"><section className="card settings-card"><div className="card-head"><div><h2>بيانات النشاط</h2><span>تظهر هذه البيانات على الفواتير والتقارير</span></div><button className="btn primary" onClick={() => { updateBusiness({ name }); notify('تم حفظ إعدادات النشاط') }}><Check size={17} /> حفظ التغييرات</button></div><div className="form-grid"><label className="full">اسم النشاط<input value={name} onChange={(e) => setName(e.target.value)} /></label><label>نوع النشاط<select defaultValue={business.type}><option>متجر تجزئة</option><option>جملة وتجزئة</option><option>مطعم ومقهى</option><option>خدمات</option></select></label><label>رقم الهاتف<input defaultValue={business.phone} /></label><label className="full">العنوان<input defaultValue={business.address} /></label><label className="full">الرقم الضريبي <small className="optional">اختياري</small><input defaultValue={business.taxNumber} placeholder="يمكن تركه فارغاً" /></label></div></section><section className="card settings-card"><div className="card-head"><div><h2>العملة واللغة</h2><span>الإعدادات المحلية لنشاطك</span></div></div><div className="settings-options"><div><b>العملة</b><span>الدينار الليبي (LYD)</span></div><div><b>الخانات العشرية</b><span>3 خانات — 1,250.000</span></div><div><b>لغة الواجهة</b><span>العربية — RTL</span></div></div></section><section className="card settings-card"><div className="card-head"><div><h2>النسخ الاحتياطي</h2><span>بياناتك محفوظة محلياً على هذا الجهاز</span></div></div><div className="backup-row"><div className="backup-symbol"><DatabaseBackup size={24} /></div><div><b>أنشئ نسخة احتياطية الآن</b><span>آخر نسخة احتياطية: {lastBackup}</span></div><button className="btn secondary" onClick={createBackup}><DatabaseBackup size={16} /> إنشاء نسخة</button><button className="btn secondary" onClick={() => fileInput.current?.click()}><ArrowUpFromLine size={16} /> استرجاع</button><input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={(e) => void restoreBackup(e.target.files?.[0])} /></div></section></div></div></div>
+}
 
 const helpArticles = [{ title: 'البدء السريع', text: 'أدخل بيانات النشاط، أضف التصنيفات والمنتجات، ثم أدخل المخزون الافتتاحي وابدأ أول عملية بيع.' }, { title: 'نقطة البيع', text: 'ابحث عن المنتج بالاسم أو SKU أو امسح الباركود. أضف المنتجات للسلة، اختر العميل وطريقة الدفع ثم احفظ الفاتورة.' }, { title: 'البيع الآجل والديون', text: 'لإنشاء بيع آجل اختر عميلاً وأدخل المبلغ المدفوع. سيظهر المتبقي تلقائياً في كشف حساب العميل.' }, { title: 'المخزون', text: 'كل تغيير في المخزون يُسجل كحركة. استخدم تسوية المخزون للإضافة أو السحب مع توضيح السبب.' }, { title: 'النسخ الاحتياطي', text: 'من الإعدادات أنشئ نسخة محلية من قاعدة البيانات. احتفظ بها في مكان آمن واسترجعها على تثبيت جديد.' }];
 function Help() { const [q, setQ] = useState(''); const list = helpArticles.filter((a) => `${a.title} ${a.text}`.includes(q)); return <div className="page-content help-page"><div className="help-hero"><div><span className="help-kicker"><HelpCircle size={17} /> مساعدة تعمل بدون إنترنت</span><h2>كيف نساعدك اليوم؟</h2><p>ابحث في دليل الاستخدام أو اختر موضوعاً للبدء.</p></div><div className="help-search"><Search size={19} /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="ابحث في دليل الاستخدام..." /></div></div><div className="help-columns"><aside className="help-topics"><b>دليل الاستخدام</b>{['البدء السريع', 'إعداد النشاط', 'المنتجات', 'المخزون', 'نقطة البيع', 'العملاء والديون', 'الموردون والمشتريات', 'التقارير', 'النسخ الاحتياطي', 'الأسئلة الشائعة'].map((x, i) => <button className={i === 0 ? 'active' : ''} key={x}>{x}</button>)}</aside><section className="help-articles"><div className="section-title"><div><h2>{q ? 'نتائج البحث' : 'ابدأ من هنا'}</h2><span>{q ? `${list.length} مقالات مطابقة` : 'كل ما تحتاجه لتشغيل نشاطك يومياً'}</span></div></div>{list.map((a, i) => <article className="help-article" key={a.title}><div className="article-number">{String(i + 1).padStart(2, '0')}</div><div><h3>{a.title}</h3><p>{a.text}</p><button className="link-button">قراءة المقال <ArrowDownToLine size={14} /></button></div></article>)}<div className="about-card"><div className="brand-mark small-mark"><ScaleIcon /></div><div><b>حول Dukkan</b><p>نظام إدارة أعمال محلي مصمم لأصحاب الأعمال في ليبيا.</p><span>إعداد وتطوير المشروع: <strong>طارق العمامي</strong> • إصدار التطوير 0.1.0</span><a href="https://github.com/Elomami1976/Dukkan" target="_blank" rel="noreferrer">المستودع الرسمي على GitHub</a></div></div></section></div></div> }
