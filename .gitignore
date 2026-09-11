@@ -1,15 +1,39 @@
+# Dependencies and generated output
 node_modules/
 dist/
-*.tsbuildinfo
 target/
 src-tauri/target/
+build/
+.vite/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and reports
+*.log
+logs/
+coverage/
+*.lcov
+
+# Rust / SQLite runtime files
 *.sqlite3
 *.sqlite3-wal
 *.sqlite3-shm
-.env
-.env.*
-*.log
+*.pid
+*.seed
+
+# OS and editor files
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+.npm/
+.cache/
+*.tsbuildinfo
+
+# Package manager output
+*.tgz
+.yarn-integrity
+.pnpm-store/
