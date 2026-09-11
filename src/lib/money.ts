@@ -13,7 +13,7 @@ export function parseMoney(value: string | number): number {
 }
 
 export function formatMoney(minor: number, compact = false): string {
-  return new Intl.NumberFormat('ar-LY', {
+  return new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 3,
     maximumFractionDigits: 3,
     notation: compact ? 'compact' : 'standard'
