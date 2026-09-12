@@ -2,13 +2,16 @@ export const CURRENCY = 'د.ل'
 export const MINOR_UNITS = 1000
 
 export function parseMoney(value: string | number): number {
-  if (typeof value === 'number') return Math.round(value * MINOR_UNITS)
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value) || value < 0 || !Number.isSafeInteger(Math.round(value * MINOR_UNITS))) throw new Error('أدخل مبلغاً صحيحاً غير سالب')
+    return Math.round(value * MINOR_UNITS)
+  }
   const normalized = value
     .replace(/[٬,\s]/g, '')
     .replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)))
     .replace('٫', '.')
   const amount = Number(normalized)
-  if (!Number.isFinite(amount) || amount < 0) throw new Error('InvalidAmount')
+  if (!normalized || !/^\d+(\.\d{0,3})?$/.test(normalized) || !Number.isFinite(amount) || amount < 0 || !Number.isSafeInteger(Math.round(amount * MINOR_UNITS))) throw new Error('InvalidAmount')
   return Math.round(amount * MINOR_UNITS)
 }
 

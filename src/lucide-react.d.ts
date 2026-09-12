@@ -14,6 +14,8 @@ declare module 'lucide-react' {
   export const ClipboardList: ComponentType<IconProps>
   export const CreditCard: ComponentType<IconProps>
   export const DatabaseBackup: ComponentType<IconProps>
+  export const Eye: ComponentType<IconProps>
+  export const EyeOff: ComponentType<IconProps>
   export const FileBarChart: ComponentType<IconProps>
   export const FileText: ComponentType<IconProps>
   export const Filter: ComponentType<IconProps>

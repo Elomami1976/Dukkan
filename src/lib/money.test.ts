@@ -15,5 +15,9 @@ describe('LYD money utilities', () => {
 
   it('rejects invalid amounts', () => {
     expect(() => parseMoney('not a number')).toThrow('InvalidAmount')
+    expect(() => parseMoney(-1)).toThrow()
+    expect(() => parseMoney(Infinity)).toThrow()
+    expect(() => parseMoney(NaN)).toThrow()
+    expect(() => parseMoney('1.0001')).toThrow()
   })
 })
