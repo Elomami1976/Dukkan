@@ -6,6 +6,7 @@ import type { Product, Sale, Purchase, Payment } from '../types'
 import { formatMoney, parseMoney } from '../lib/money'
 import { dayKey, todayKey, displayDate } from '../lib/data'
 import { csv, printTable } from '../lib/output'
+import { printInvoice } from '../lib/invoice'
 
 type Notify = { notify: (message: string) => void }
 type Cells = (string | number)[][]
@@ -36,7 +37,7 @@ function invoiceRows(s: Sale | Purchase): Cells {
 function Receipt({ sale, close }: { sale: Sale | Purchase; close: () => void }) {
   const business = useAppStore(s => s.business), rows = invoiceRows(sale), title = business.name + ' - ' + sale.id, headings = ['الصنف', 'الكمية', 'الوحدة', 'السعر', 'الإجمالي']
   const info: Cells = [['النشاط', business.name], ['الهاتف', business.phone], ['العنوان', business.address], ['التاريخ', displayDate(sale.date)], ['الطرف', 'supplier' in sale ? sale.supplier : sale.customer], ...('method' in sale ? [['طريقة الدفع', sale.method || 'غير مسجلة']] : []), ...('discount' in sale ? [['الخصم', formatMoney(sale.discount || 0)]] : [])]
-  return <Dialog title="تفاصيل الفاتورة" close={close}><p>{title}</p><Table headings={['البيان', 'القيمة']} rows={info} />{!sale.lines && <p className="form-error">الفاتورة القديمة لا تحتوي تفاصيل الأصناف.</p>}<Table headings={headings} rows={rows} /><button className="btn primary" onClick={() => printTable(title, headings, [...info.map(r => [r[0], r[1], '', '', '']), ...rows])}><Printer size={17} />طباعة الفاتورة</button></Dialog>
+  return <Dialog title="تفاصيل الفاتورة" close={close}><p>{title}</p><Table headings={['البيان', 'القيمة']} rows={info} />{!sale.lines && <p className="form-error">الفاتورة القديمة لا تحتوي تفاصيل الأصناف.</p>}<Table headings={headings} rows={rows} /><button className="btn primary" onClick={() => void printInvoice(business, sale)}><Printer size={17} />طباعة الفاتورة</button></Dialog>
 }
 
 export function Dashboard({ onNavigate }: { onNavigate: (page: 'pos' | 'products' | 'purchases' | 'expenses') => void }) {

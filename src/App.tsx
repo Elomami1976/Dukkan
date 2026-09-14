@@ -37,19 +37,20 @@ function App() {
   const [page, setPage] = useState<Page>('dashboard')
   const [showMobileNav, setShowMobileNav] = useState(false)
   const [toast, setToast] = useState('')
+  const [switchingUser, setSwitchingUser] = useState(false)
   const go = (next: Page) => { if (!isAdmin() && !['pos', 'sales', 'customers', 'help'].includes(next)) return; setPage(next); setShowMobileNav(false) }
   const notify = (message: string) => { setToast(message); window.setTimeout(() => setToast(''), 2600) }
 
   if (loadError) return <main className="auth-page"><p role="alert">{loadError}</p></main>
   if (!setupComplete) return <SetupWizard />
-  if (!sessionId || !users.some(u => u.id === sessionId && u.active)) return <AuthScreen />
+  if (!sessionId || !users.some(u => u.id === sessionId && u.active)) return <AuthScreen switchingUser={switchingUser} />
   const shownPage = !isAdmin() && !['pos', 'sales', 'customers', 'help'].includes(page) ? 'pos' : page
   return <div className="app" dir="rtl" style={{ '--primary': business.primaryColor } as CSSProperties}>
     <Sidebar page={shownPage} onNavigate={go} open={showMobileNav} onClose={() => setShowMobileNav(false)} />
     <main className="main-shell">
       <header className="topbar">
         <div className="topbar-start"><button className="icon-button mobile-menu" onClick={() => setShowMobileNav(true)}><Menu size={20} /></button><div className="offline-pill"><span className="online-dot" /> يعمل بدون إنترنت</div></div>
-        <div className="topbar-actions"><button className="icon-button" title="تسجيل الخروج" aria-label="تسجيل الخروج" onClick={() => { logout(); setPage('dashboard') }}><LogOut size={19} /></button><div className="top-user"><div className="avatar small">{activeUser.slice(0, 1)}</div><div><b>{activeUser}</b><small>{isAdmin() ? 'مدير النظام' : 'كاشير'}</small></div><ChevronDown size={15} /></div></div>
+        <div className="topbar-actions"><button className="btn secondary" onClick={() => { if (!window.confirm('تبديل المستخدم؟ ستُغلق أي فاتورة أو تعديلات لم تحفظها بعد.')) return; setSwitchingUser(true); logout(); setPage('dashboard'); setShowMobileNav(false); setToast('') }}><Users size={18} />تبديل المستخدم</button><button className="icon-button" title="تسجيل الخروج" aria-label="تسجيل الخروج" onClick={() => { setSwitchingUser(false); logout(); setPage('dashboard') }}><LogOut size={19} /></button><div className="top-user"><div className="avatar small">{activeUser.slice(0, 1)}</div><div><b>{activeUser}</b><small>{isAdmin() ? 'مدير النظام' : 'كاشير'}</small></div><ChevronDown size={15} /></div></div>
       </header>
       <div className="page-wrap">
         <PageHeader page={shownPage} onNavigate={go} />
@@ -123,7 +124,7 @@ function SettingsPage({ notify }: { notify: (m: string) => void }) {
   </form><h2>النسخ الاحتياطي</h2><p>آخر نسخة: {s.lastBackup ? displayDate(s.lastBackup) : 'لم تنشأ نسخة بعد'}</p><div className="toolbar-actions"><button className="btn secondary" onClick={backup}><DatabaseBackup size={18} />إنشاء نسخة</button><button className="btn secondary" onClick={() => input.current?.click()}><ArrowUpFromLine size={18} />استرجاع</button><input ref={input} type="file" hidden accept=".json,application/json" onChange={e => void restore(e.target.files?.[0])} /></div>{error && <p role="alert" className="form-error">{error}</p>}
   {pending && <Modal title="تأكيد استرجاع النسخة" onClose={() => setPending('')}><div className="dialog-body"><p>سيتم استبدال بيانات النشاط الحالية ببيانات النسخة المحددة. حسابات المستخدمين الحالية ستبقى كما هي.</p><button className="btn secondary" onClick={backup}>تنزيل نسخة من البيانات الحالية</button><button className="btn primary" onClick={() => { try { s.restoreBackup(pending); setDraft(useAppStore.getState().business); setPending(''); notify('تم استرجاع البيانات') } catch (e) { setError(e instanceof Error ? e.message : 'تعذر الاسترجاع'); setPending('') } }}>تأكيد الاسترجاع</button></div></Modal>}</div>
 }
-function AuthScreen() {
+function AuthScreen({ switchingUser = false }: { switchingUser?: boolean }) {
   const s = useAppStore(), legacy = s.users.length === 0
   const [name, setName] = useState(s.activeUser), [username, setUsername] = useState(''), [password, setPassword] = useState(''), [confirm, setConfirm] = useState(''), [error, setError] = useState(''), [busy, setBusy] = useState(false)
   const submit = async (e: FormEvent) => {
@@ -132,9 +133,9 @@ function AuthScreen() {
     try { if (legacy) { if (password !== confirm) throw new Error('كلمتا المرور غير متطابقتين'); await s.createAdmin(name, username, password) } else await s.login(username, password) }
     catch (e) { setError(e instanceof Error ? e.message : 'تعذر تسجيل الدخول') } finally { setBusy(false) }
   }
-  return <main className="auth-page" dir="rtl"><div className="auth-panel"><h1>{s.business.name || 'Dukkan'}</h1><h2>{legacy ? 'تعيين حساب المدير' : 'تسجيل الدخول'}</h2>{legacy && <p>الإصدار السابق لم يحفظ كلمة المرور. أنشئ حساب المدير لحماية الدخول مع الاحتفاظ ببيانات نشاطك.</p>}<form onSubmit={submit} className="form-grid">
+  return <main className="auth-page" dir="rtl"><div className="auth-panel"><h1>{s.business.name || 'Dukkan'}</h1><h2>{legacy ? 'تعيين حساب المدير' : switchingUser ? 'تبديل المستخدم' : 'تسجيل الدخول'}</h2>{switchingUser && !legacy && <p>اختر المستخدم وأدخل كلمة مروره للمتابعة دون إغلاق البرنامج.</p>}{legacy && <p>الإصدار السابق لم يحفظ كلمة المرور. أنشئ حساب المدير لحماية الدخول مع الاحتفاظ ببيانات نشاطك.</p>}<form onSubmit={submit} className="form-grid">
   {legacy && <label className="full">الاسم<input required value={name} onChange={e => setName(e.target.value)} /></label>}
-  <label className="full">اسم المستخدم<input required autoComplete="username" value={username} onChange={e => setUsername(e.target.value)} /></label>
+  <label className="full">اسم المستخدم{switchingUser && !legacy ? <select required value={username} onChange={e => { setUsername(e.target.value); setPassword(''); setError('') }}><option value="">اختر المستخدم</option>{s.users.filter(u => u.active).map(u => <option key={u.id} value={u.username}>{u.name} — {u.username}</option>)}</select> : <input required autoComplete="username" value={username} onChange={e => setUsername(e.target.value)} />}</label>
   <div className="full"><PasswordField id="login-password" label="كلمة المرور" value={password} onChange={setPassword} /></div>
   {legacy && <div className="full"><PasswordField id="login-confirm" label="تأكيد كلمة المرور" value={confirm} onChange={setConfirm} /></div>}
   {error && <p className="form-error full" role="alert">{error}</p>}<button className="btn primary full" type="submit" disabled={busy}>{busy ? 'جارٍ التحقق' : legacy ? 'حفظ حساب المدير' : 'دخول'}</button>
