@@ -15,9 +15,10 @@ import { download } from './lib/output'
 import type { Business, Product } from './types'
 import { formatMoney, formatNumber, parseMoney } from './lib/money'
 import logoUrl from '../logo.png'
+import './help.css'
 
 type Icon = ComponentType<{ size?: number; strokeWidth?: number; className?: string }>
-type Page = 'dashboard' | 'pos' | 'products' | 'inventory' | 'sales' | 'purchases' | 'customers' | 'suppliers' | 'expenses' | 'reports' | 'users' | 'settings' | 'help'
+type Page = 'dashboard' | 'pos' | 'products' | 'inventory' | 'sales' | 'purchases' | 'customers' | 'suppliers' | 'expenses' | 'reports' | 'users' | 'settings' | 'help' | 'about'
 
 const nav: { id: Page; label: string; icon: Icon }[] = [
   { id: 'dashboard', label: 'لوحة التحكم', icon: Home },
@@ -38,13 +39,13 @@ function App() {
   const [showMobileNav, setShowMobileNav] = useState(false)
   const [toast, setToast] = useState('')
   const [switchingUser, setSwitchingUser] = useState(false)
-  const go = (next: Page) => { if (!isAdmin() && !['pos', 'sales', 'customers', 'help'].includes(next)) return; setPage(next); setShowMobileNav(false) }
+  const go = (next: Page) => { if (!isAdmin() && !['pos', 'sales', 'customers', 'help', 'about'].includes(next)) return; setPage(next); setShowMobileNav(false) }
   const notify = (message: string) => { setToast(message); window.setTimeout(() => setToast(''), 2600) }
 
   if (loadError) return <main className="auth-page"><p role="alert">{loadError}</p></main>
   if (!setupComplete) return <SetupWizard />
   if (!sessionId || !users.some(u => u.id === sessionId && u.active)) return <AuthScreen switchingUser={switchingUser} />
-  const shownPage = !isAdmin() && !['pos', 'sales', 'customers', 'help'].includes(page) ? 'pos' : page
+  const shownPage = !isAdmin() && !['pos', 'sales', 'customers', 'help', 'about'].includes(page) ? 'pos' : page
   return <div className="app" dir="rtl" style={{ '--primary': business.primaryColor } as CSSProperties}>
     <Sidebar page={shownPage} onNavigate={go} open={showMobileNav} onClose={() => setShowMobileNav(false)} />
     <main className="main-shell">
@@ -67,6 +68,7 @@ function App() {
         {shownPage === 'users' && <UsersPage />}
         {shownPage === 'settings' && <SettingsPage notify={notify} />}
         {shownPage === 'help' && <Help />}
+        {shownPage === 'about' && <About />}
       </div>
     </main>
     {toast && <div className="toast"><Check size={17} /> {toast}</div>}
@@ -87,8 +89,9 @@ function Sidebar({ page, onNavigate, open, onClose }: { page: Page; onNavigate: 
       {isAdmin() && <NavItem item={{ id: 'users', label: 'المستخدمون والصلاحيات', icon: ShieldCheck }} active={page === 'users'} onNavigate={onNavigate} />}
       {isAdmin() && <NavItem item={{ id: 'settings', label: 'الإعدادات', icon: Settings }} active={page === 'settings'} onNavigate={onNavigate} />}
       <NavItem item={{ id: 'help', label: 'مركز المساعدة', icon: CircleHelp }} active={page === 'help'} onNavigate={onNavigate} />
+      <NavItem item={{ id: 'about', label: 'حول النظام', icon: Sparkles }} active={page === 'about'} onNavigate={onNavigate} />
     </nav>
-    <div className="sidebar-footer"><div className="backup-hint"><DatabaseBackup size={18} /><div><b>نسخة احتياطية</b><span>نسخ محلية من الإعدادات</span></div><ArrowUpFromLine size={15} /></div><div className="version">Dukkan <span>v0.1.0</span></div></div>
+    <div className="sidebar-footer"><div className="backup-hint"><DatabaseBackup size={18} /><div><b>نسخة احتياطية</b><span>نسخ محلية من الإعدادات</span></div><ArrowUpFromLine size={15} /></div><div className="version">Dukkan <span>v1.0.0</span></div></div>
   </aside></>
 }
 
@@ -96,7 +99,7 @@ function ScaleIcon() { return <svg viewBox="0 0 24 24" width="24" height="24" fi
 function NavItem({ item, active, onNavigate }: { item: { id: Page; label: string; icon: Icon }; active: boolean; onNavigate: (p: Page) => void }) { const Icon = item.icon; return <button className={`nav-item ${active ? 'active' : ''}`} onClick={() => onNavigate(item.id)}><Icon size={18} strokeWidth={active ? 2.4 : 1.8} /><span>{item.label}</span></button> }
 
 function PageHeader({ page, onNavigate }: { page: Page; onNavigate: (p: Page) => void }) {
-  const info: Record<Page, [string, string]> = { dashboard: ['لوحة التحكم', 'ملخص نشاطك اليوم'], pos: ['نقطة البيع', 'أنشئ فاتورة جديدة بسرعة وسهولة'], products: ['المنتجات', 'أدر منتجاتك وأسعارك ومخزونك'], inventory: ['المخزون', 'تابع الكميات وحركات المخزون'], sales: ['المبيعات', 'كل فواتير ومبيعات نشاطك في مكان واحد'], purchases: ['المشتريات', 'تابع التوريدات وفواتير الموردين'], customers: ['العملاء والديون', 'إدارة العملاء وكشوف الحساب'], suppliers: ['الموردون', 'تابع الموردين ومستحقاتهم'], expenses: ['المصروفات', 'سجل وتابع مصروفات نشاطك'], reports: ['التقارير', 'أرقام واضحة تساعدك على اتخاذ القرار'], users: ['المستخدمون والصلاحيات', 'تحكم في وصول فريقك للنظام'], settings: ['الإعدادات', 'خصص Dukkan ليتناسب مع نشاطك'], help: ['مركز المساعدة', 'كل ما تحتاجه لاستخدام Dukkan'] }
+  const info: Record<Page, [string, string]> = { dashboard: ['لوحة التحكم', 'ملخص نشاطك اليوم'], pos: ['نقطة البيع', 'أنشئ فاتورة جديدة بسرعة وسهولة'], products: ['المنتجات', 'أدر منتجاتك وأسعارك ومخزونك'], inventory: ['المخزون', 'تابع الكميات وحركات المخزون'], sales: ['المبيعات', 'كل فواتير ومبيعات نشاطك في مكان واحد'], purchases: ['المشتريات', 'تابع التوريدات وفواتير الموردين'], customers: ['العملاء والديون', 'إدارة العملاء وكشوف الحساب'], suppliers: ['الموردون', 'تابع الموردين ومستحقاتهم'], expenses: ['المصروفات', 'سجل وتابع مصروفات نشاطك'], reports: ['التقارير', 'أرقام واضحة تساعدك على اتخاذ القرار'], users: ['المستخدمون والصلاحيات', 'تحكم في وصول فريقك للنظام'], settings: ['الإعدادات', 'خصص Dukkan ليتناسب مع نشاطك'], help: ['مركز المساعدة', 'دليل شامل لاستخدام جميع أقسام Dukkan'], about: ['حول النظام', 'رسالة Dukkan ومهمته ومطوره'] }
   const [title, subtitle] = info[page]
   return <div className="page-header"><div><div className="eyebrow">الرئيسية <span>/</span> {title.replace('، طارق 👋', '')}</div><h1>{title}</h1><p>{subtitle}</p></div>{page === 'dashboard' && <div className="header-actions"><span>{new Date().toLocaleDateString('ar-LY')}</span><button className="btn primary" onClick={() => onNavigate('pos')}><Plus size={18} /> عملية بيع جديدة</button></div>}</div>
 }
@@ -142,11 +145,52 @@ function AuthScreen({ switchingUser = false }: { switchingUser?: boolean }) {
   </form></div></main>
 }
 
-const helpArticles = [{ title: 'إضافة كاشير', text: 'يدخل المدير إلى المستخدمين والصلاحيات، ثم يختار إضافة مستخدم ويحدد دور كاشير. يسجل الكاشير الدخول باسمه وكلمة مروره، ويمكنه البيع وإدارة العملاء والدفعات دون إعدادات الإدارة.' }, { title: 'البدء السريع', text: 'أدخل بيانات النشاط وحساب المدير، ثم أضف المنتجات واختر تصنيفها ووحدتها وكميتها الافتتاحية وابدأ البيع.' }, { title: 'نقطة البيع', text: 'ابحث عن المنتج بالاسم أو SKU أو امسح الباركود. أضف المنتجات للسلة، اختر العميل وطريقة الدفع ثم احفظ الفاتورة.' }, { title: 'البيع الآجل والديون', text: 'لإنشاء بيع آجل اختر عميلاً وأدخل المبلغ المدفوع. سيظهر المتبقي تلقائياً في كشف حساب العميل.' }, { title: 'المخزون', text: 'كل تغيير في المخزون يُسجل كحركة. استخدم تسوية المخزون للإضافة أو السحب مع توضيح السبب.' }, { title: 'النسخ الاحتياطي', text: 'من الإعدادات ينزّل المدير نسخة JSON من بيانات النشاط. الاسترجاع يستبدل بيانات النشاط بعد التأكيد، ولا يستبدل حسابات المستخدمين. احتفظ بالنسخة في مكان آمن.' }];
+const helpArticles = [
+  { category: 'البداية', title: 'البدء وإعداد النشاط', steps: ['عند التشغيل الأول أدخل اسم النشاط ونوعه ورقم الهاتف والعنوان؛ الرقم الضريبي اختياري.', 'اختر اللون الرئيسي وأضف شعار المحل، ثم راجع العملة والخانات العشرية.', 'أنشئ حساب المدير بكلمة مرور قوية من 8 أحرف على الأقل، ثم احتفظ ببيانات الدخول في مكان آمن.', 'ابدأ بإضافة التصنيفات والمنتجات والموردين، وبعدها سجّل الكميات الافتتاحية أو المشتريات.'] },
+  { category: 'الرئيسية', title: 'لوحة التحكم', steps: ['تعرض ملخص المبيعات والأرباح والفواتير وحالة المخزون.', 'استخدم تنبيهات المخزون لمعرفة الأصناف التي قاربت على النفاد.', 'راجع المؤشرات يوميًا، ثم افتح التقارير للحصول على تفاصيل أوسع.', 'زر «عملية بيع جديدة» ينقلك مباشرة إلى نقطة البيع.'] },
+  { category: 'المبيعات', title: 'نقطة البيع وإنشاء فاتورة', steps: ['ابحث عن المنتج بالاسم أو SKU أو الباركود، ثم اضغط عليه لإضافته إلى السلة.', 'عدّل الكمية من السلة وتأكد من السعر والإجمالي قبل الحفظ.', 'اختر العميل عند البيع الآجل، وحدد طريقة الدفع والمبلغ المدفوع.', 'أكمل البيع؛ يحفظ النظام الفاتورة ويخصم الكميات من المخزون تلقائيًا.', 'إذا لم تكفِ الكمية، يمنع النظام بيع كمية أكبر من المتوفر.'] },
+  { category: 'المنتجات', title: 'المنتجات والتصنيفات والباركود', steps: ['أضف اسم المنتج والتصنيف والوحدة وSKU أو الباركود وسعر الشراء وسعر البيع.', 'اجعل SKU والباركود مميزين لكل منتج لتجنب الالتباس عند البحث والبيع.', 'حدّد كمية التنبيه المناسبة حتى يظهر الصنف في تنبيهات النقص مبكرًا.', 'لمحل الملابس: أنشئ منتجًا مستقلًا لكل تركيبة موديل ولون ومقاس، مثل «قميص أسود — M».', 'راجع سعر الشراء والبيع قبل الحفظ لأنهما يؤثران في قيمة المخزون وحساب الربح.'] },
+  { category: 'المخزون', title: 'المخزون وحركات التسوية', steps: ['تعرض صفحة المخزون الكمية الحالية وحالة كل صنف وسجل الحركات.', 'استخدم تسوية المخزون عند الجرد أو التلف أو الفقد أو المرتجع، واختر إضافة أو سحب.', 'اكتب سببًا واضحًا لكل تسوية، مثل «جرد شهري» أو «تالف» أو «مرتجع فاتورة».', 'التوريدات ترفع المخزون والمبيعات تخفضه تلقائيًا؛ لا تكرر تعديل الكمية يدويًا.', 'نفّذ جردًا دوريًا وقارن الكمية الفعلية بالكمية المسجلة.'] },
+  { category: 'المبيعات', title: 'المبيعات والفواتير', steps: ['تعرض الصفحة جميع الفواتير مع العميل والإجمالي والمدفوع والحالة وطريقة الدفع.', 'استخدم البحث والتصفية للوصول إلى فاتورة أو فترة معينة.', 'حالة «مدفوعة» تعني سداد كامل القيمة، و«جزئية» تعني وجود مبلغ متبقٍ.', 'عند مراجعة اختلاف، طابق الفاتورة مع حركة المخزون وكشف حساب العميل.'] },
+  { category: 'المشتريات', title: 'المشتريات والتوريدات', steps: ['أضف المورد أولًا حتى تتمكن من ربط التوريد بحسابه.', 'أنشئ عملية شراء، واختر المورد والأصناف والكميات وتكلفة الوحدة.', 'أدخل المبلغ المدفوع بدقة؛ يسجل النظام المتبقي ضمن مستحقات المورد.', 'عند الحفظ، تزداد كميات المنتجات وتُحدّث تكلفة الشراء.', 'راجع الأصناف والكميات قبل التأكيد لأن التوريد يؤثر مباشرة في المخزون والحسابات.'] },
+  { category: 'العملاء', title: 'العملاء والبيع الآجل والدفعات', steps: ['أضف اسم العميل ورقم هاتفه وملاحظاته لتسهيل التعرف عليه.', 'اختر العميل في نقطة البيع إذا كانت الفاتورة آجلة أو مدفوعة جزئيًا.', 'يظهر المتبقي تلقائيًا في رصيد العميل وكشف حسابه.', 'عند استلام دفعة لاحقة، افتح العميل وسجّل الدفعة؛ لا تسجلها كمبيعات جديدة.', 'راجع كشف الحساب مع العميل دوريًا، وتأكد من توثيق كل دفعة.'] },
+  { category: 'الموردون', title: 'الموردون ومستحقاتهم', steps: ['سجّل بيانات المورد قبل إدخال مشترياته.', 'كل شراء غير مدفوع بالكامل يزيد المبلغ المستحق للمورد.', 'سجّل دفعات المورد من صفحته حتى ينخفض الرصيد ويظهر السجل صحيحًا.', 'طابق رصيد المورد مع فواتيره وإيصالات الدفع بصورة دورية.'] },
+  { category: 'المصروفات', title: 'تسجيل المصروفات', steps: ['سجّل الإيجار والكهرباء والنقل والرواتب والصيانة وأي تكلفة تشغيلية أخرى.', 'اختر التصنيف الصحيح، واكتب وصفًا واضحًا والمبلغ والتاريخ.', 'لا تسجل شراء البضاعة كمصروف؛ أدخله في المشتريات حتى يتحدث المخزون.', 'راجع المصروفات في التقارير لمعرفة أثرها في صافي نتيجة النشاط.'] },
+  { category: 'التقارير', title: 'التقارير وفهم الأرقام', steps: ['اختر الفترة الزمنية المطلوبة قبل الاعتماد على النتائج.', 'المبيعات هي قيمة الفواتير، بينما الربح يعتمد على سعر البيع وتكلفة الأصناف المسجلة.', 'راجع أفضل المنتجات وحركة المخزون والديون والمصروفات لاتخاذ قرارات الشراء والتسعير.', 'دقة التقرير تعتمد على تسجيل كل عملية بيع وشراء ودفعة ومصروف في وقتها.'] },
+  { category: 'الإدارة', title: 'المستخدمون والصلاحيات', steps: ['يدخل المدير إلى «المستخدمون والصلاحيات» لإضافة حساب جديد.', 'حساب المدير يدير البيانات والإعدادات والمخزون والمستخدمين، بينما الكاشير يصل إلى مهام البيع المسموح بها.', 'أنشئ حسابًا مستقلًا لكل موظف ولا تشارك كلمة مرور المدير.', 'عند توقف موظف عن العمل، عطّل حسابه بدل استخدامه من موظف آخر.', 'استخدم «تبديل المستخدم» لتسليم الوردية دون إغلاق البرنامج.'] },
+  { category: 'الإدارة', title: 'الإعدادات وتخصيص النظام', steps: ['عدّل اسم النشاط ونوعه والهاتف والعنوان والرقم الضريبي والشعار واللون الرئيسي.', 'راجع البيانات قبل حفظها لأنها تظهر ضمن هوية النشاط ومخرجات النظام.', 'إعدادات الإدارة والنسخ الاحتياطي متاحة للمدير حفاظًا على البيانات.'] },
+  { category: 'الحماية', title: 'إنشاء نسخة احتياطية', steps: ['اذهب إلى «الإعدادات» واضغط «إنشاء نسخة».', 'سيُنزل ملف باسم قريب من Dukkan-Backup-YYYY-MM-DD.json في مجلد التنزيلات.', 'أنشئ نسخة يومية أو أسبوعية حسب حجم العمل، وانسخها إلى قرص خارجي أو تخزين سحابي موثوق.', 'النسخة تشمل بيانات النشاط ولا تتضمن كلمات مرور المستخدمين. لا تعدّل ملف JSON يدويًا.'] },
+  { category: 'الحماية', title: 'استرجاع نسخة احتياطية بأمان', steps: ['أنشئ نسخة من البيانات الحالية أولًا حتى تتمكن من الرجوع إليها.', 'من «الإعدادات» اضغط «استرجاع» واختر ملف النسخة بصيغة JSON.', 'يراجع النظام صلاحية الملف، ثم يعرض رسالة تأكيد قبل استبدال بيانات النشاط.', 'بعد التأكيد، راجع اسم النشاط وعدة منتجات وفواتير وأرصدة للتأكد من اكتمال الاستعادة.', 'الاسترجاع لا يستبدل حسابات المستخدمين الحالية.'] },
+  { category: 'إرشادات', title: 'المرتجعات والاستبدال والجرد', steps: ['عند رجوع قطعة للمخزون، سجّل تسوية إضافة مع رقم الفاتورة والسبب.', 'في الاستبدال، أعد القطعة القديمة للمخزون ثم أنشئ بيعًا للقطعة الجديدة حتى تبقى الكميات صحيحة.', 'عند التلف أو الفقد، سجّل تسوية سحب مع السبب بدل حذف المنتج.', 'بعد الجرد، عالج كل فرق بتسوية موثقة وراجع سجل الحركات.'] },
+  { category: 'إرشادات', title: 'نصائح لمحل الملابس', steps: ['استخدم رمزًا منظمًا يجمع الموديل واللون والمقاس، مثل SH-BLK-M.', 'أدخل كل مقاس ولون كمنتج منفصل لتعرف الكمية المتاحة بدقة.', 'اجعل التصنيفات واضحة مثل رجالي ونسائي وأطفال وأحذية وإكسسوارات.', 'استخدم تنبيه المخزون للمقاسات السريعة النفاد، وراجع أفضل الموديلات من التقارير.', 'سجّل المرتجعات والاستبدالات فورًا حتى لا تظهر قطعة غير موجودة فعليًا.'] },
+  { category: 'الحماية', title: 'العمل دون إنترنت وحماية البيانات', steps: ['يعمل Dukkan محليًا دون الحاجة إلى اتصال دائم بالإنترنت.', 'حافظ على الجهاز وحساب نظام التشغيل بكلمة مرور، ولا تمنح الوصول لغير المصرح لهم.', 'النسخة الاحتياطية مسؤولية المدير؛ احتفظ بأكثر من نسخة واختبر الاسترجاع دوريًا.', 'لا تغلق البرنامج أثناء حفظ عملية، وتحقق من ظهور رسالة النجاح قبل الانتقال.'] },
+]
 function Help() {
   const [q, setQ] = useState('')
-  const articles = helpArticles.filter(a => (a.title + a.text).includes(q))
-  return <div className="page-content"><div className="search-box"><Search size={18} /><input aria-label="بحث في المساعدة" value={q} onChange={e => setQ(e.target.value)} placeholder="ابحث في المساعدة..." /></div>{articles.map(a => <details className="help-detail" key={a.title}><summary>{a.title}</summary><p>{a.text}</p></details>)}</div>
+  const [category, setCategory] = useState('الكل')
+  const categories = ['الكل', ...Array.from(new Set(helpArticles.map(a => a.category)))]
+  const normalized = q.trim().toLocaleLowerCase('ar')
+  const articles = helpArticles.filter(a => (category === 'الكل' || a.category === category) && !normalized || (category === 'الكل' || a.category === category) && (a.title + a.category + a.steps.join(' ')).toLocaleLowerCase('ar').includes(normalized))
+  return <div className="page-content help-page">
+    <div className="help-intro"><div><span><CircleHelp size={17} /> دليل Dukkan</span><h2>كيف يمكننا مساعدتك؟</h2><p>اختر قسمًا أو ابحث عن المهمة التي تريد تنفيذها. يعمل هذا الدليل بالكامل دون إنترنت.</p></div><div className="search-box help-main-search"><Search size={18} /><input aria-label="بحث في المساعدة" value={q} onChange={e => setQ(e.target.value)} placeholder="مثال: إضافة منتج، بيع آجل، استرجاع نسخة..." /></div></div>
+    <div className="help-filter" aria-label="تصنيفات المساعدة">{categories.map(c => <button key={c} className={category === c ? 'selected' : ''} onClick={() => setCategory(c)}>{c}</button>)}</div>
+    <p className="help-count">{articles.length ? `${articles.length} موضوعًا متاحًا` : 'لا توجد نتيجة مطابقة. جرّب كلمة أخرى أو اختر «الكل».'}</p>
+    <div className="help-list">{articles.map((a, index) => <details className="help-detail" key={a.title} open={articles.length === 1}><summary><span className="help-number">{String(index + 1).padStart(2, '0')}</span><span><small>{a.category}</small><b>{a.title}</b></span><ChevronDown size={19} /></summary><div className="help-detail-body"><ol>{a.steps.map(step => <li key={step}>{step}</li>)}</ol></div></details>)}</div>
+  </div>
+}
+
+function About() {
+  return <div className="page-content about-page">
+    <section className="about-hero"><div className="about-logo"><img src={logoUrl} alt="شعار Dukkan" /></div><div><span>نظام إدارة أعمال محلي</span><h2>Dukkan — دكان</h2><p>أداة عربية بسيطة تساعد صاحب النشاط على إدارة المبيعات والمخزون والمشتريات والعملاء والموردين والمصروفات والتقارير من مكان واحد، حتى دون اتصال بالإنترنت.</p></div></section>
+    <div className="about-grid">
+      <section className="about-section"><Store size={25} /><h3>مهمة النظام</h3><p>تحويل العمل اليومي في المحل إلى سجلات واضحة ومترابطة، وتقليل الأخطاء في الحساب والمخزون والديون، وتقديم أرقام مفهومة تساعد صاحب النشاط على اتخاذ قرار أفضل.</p></section>
+      <section className="about-section"><ShieldCheck size={25} /><h3>الخصوصية والاستقلال</h3><p>صُمم Dukkan ليعمل محليًا ويظل نافعًا عند ضعف الإنترنت أو انقطاعه. تبقى إدارة النسخ الاحتياطية بيد صاحب النشاط، ليحافظ على بياناته وينقلها عند الحاجة.</p></section>
+      <section className="about-section"><Users size={25} /><h3>لمن صُمم؟</h3><p>للمتاجر والمشروعات الصغيرة، ولأصحاب الأعمال الذين يريدون نظامًا عربيًا مباشرًا لا يثقل يومهم بالتعقيد، مع صلاحيات مناسبة للمدير والكاشير.</p></section>
+      <section className="about-section"><Sparkles size={25} /><h3>رؤية التطوير</h3><p>أن تكون التقنية قريبة من الناس، مفهومة لهم، ومساندة لرزقهم؛ أداة تختصر الوقت وتحفظ الحقوق وتساعد النشاط الصغير على التنظيم والنمو بثقة.</p></section>
+    </div>
+    <section className="developer-message"><div className="developer-name"><span>إعداد وتطوير</span><strong>طارق العمامي</strong><small>Tarek Al-Emami</small></div><blockquote>«أقدّم Dukkan إيمانًا بأن خدمة الناس تبدأ بفهم احتياجاتهم اليومية. رسالتي أن أجعل التقنية وسيلة للتيسير وحفظ الجهد والحقوق، وأن أضع بين يدي صاحب العمل أداة صادقة وبسيطة تعينه على رزقه وخدمة مجتمعه.»</blockquote></section>
+    <footer className="about-footer"><b>Dukkan v1.0.0</b><span>صُمم بعناية لخدمة أصحاب الأعمال في ليبيا</span></footer>
+  </div>
 }
 
 function SetupHelp() {
