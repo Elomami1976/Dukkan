@@ -8,13 +8,13 @@
 
 الموقع العام: [elomami1976.github.io/Dukkan](https://elomami1976.github.io/Dukkan/)
 
-أحدث إصدار: [تنزيل Dukkan-Setup-1.0.0.exe](https://github.com/Elomami1976/Dukkan/releases/download/v1.0.0/Dukkan-Setup-1.0.0.exe) · [Release v1.0.0](https://github.com/Elomami1976/Dukkan/releases/tag/v1.0.0)
+أحدث إصدار: [تنزيل Dukkan-Setup-1.0.1.exe](https://github.com/Elomami1976/Dukkan/releases/download/v1.0.1/Dukkan-Setup-1.0.1.exe) · [Release v1.0.1](https://github.com/Elomami1976/Dukkan/releases/tag/v1.0.1)
 
 مصدر الموقع موجود في [`docs/`](docs/)، ويتم نشره عبر GitHub Pages من فرع `main`. زر التنزيل في الموقع يتحقق من وجود Windows Installer رسمي قبل تفعيله.
 
 ## حالة المشروع
 
-الإصدار `v1.0.0` منشور وجاهز لمستخدمي Windows. تم بناء Windows Installer بصيغة NSIS واختبار تثبيته وتشغيله على بيئة Windows نظيفة قبل النشر.
+الإصدار `v1.0.1` منشور وجاهز لمستخدمي Windows. تم بناء Windows Installer بصيغة NSIS واختبار تثبيته وتشغيله على بيئة Windows نظيفة قبل النشر.
 
 ## For Users
 

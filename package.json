@@ -1,6 +1,6 @@
 {
   "name": "dukkan-business-manager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "نظام Dukkan لإدارة الأعمال والمبيعات لنشاطك في ليبيا",
   "type": "module",

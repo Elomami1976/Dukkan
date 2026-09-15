@@ -1,6 +1,6 @@
 [package]
 name = "dukkan"
-version = "1.0.0"
+version = "1.0.1"
 description = "Dukkan — نظام إدارة الأعمال المحلي"
 authors = ["طارق العمامي"]
 edition = "2021"

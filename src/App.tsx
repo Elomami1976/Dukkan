@@ -91,7 +91,7 @@ function Sidebar({ page, onNavigate, open, onClose }: { page: Page; onNavigate: 
       <NavItem item={{ id: 'help', label: 'مركز المساعدة', icon: CircleHelp }} active={page === 'help'} onNavigate={onNavigate} />
       <NavItem item={{ id: 'about', label: 'حول النظام', icon: Sparkles }} active={page === 'about'} onNavigate={onNavigate} />
     </nav>
-    <div className="sidebar-footer"><div className="backup-hint"><DatabaseBackup size={18} /><div><b>نسخة احتياطية</b><span>نسخ محلية من الإعدادات</span></div><ArrowUpFromLine size={15} /></div><div className="version">Dukkan <span>v1.0.0</span></div></div>
+    <div className="sidebar-footer"><div className="backup-hint"><DatabaseBackup size={18} /><div><b>نسخة احتياطية</b><span>نسخ محلية من الإعدادات</span></div><ArrowUpFromLine size={15} /></div><div className="version">Dukkan <span>v1.0.1</span></div></div>
   </aside></>
 }
 
@@ -189,7 +189,7 @@ function About() {
       <section className="about-section"><Sparkles size={25} /><h3>رؤية التطوير</h3><p>أن تكون التقنية قريبة من الناس، مفهومة لهم، ومساندة لرزقهم؛ أداة تختصر الوقت وتحفظ الحقوق وتساعد النشاط الصغير على التنظيم والنمو بثقة.</p></section>
     </div>
     <section className="developer-message"><div className="developer-name"><span>إعداد وتطوير</span><strong>طارق العمامي</strong><small>Tarek Al-Emami</small></div><blockquote>«أقدّم Dukkan إيمانًا بأن خدمة الناس تبدأ بفهم احتياجاتهم اليومية. رسالتي أن أجعل التقنية وسيلة للتيسير وحفظ الجهد والحقوق، وأن أضع بين يدي صاحب العمل أداة صادقة وبسيطة تعينه على رزقه وخدمة مجتمعه.»</blockquote></section>
-    <footer className="about-footer"><b>Dukkan v1.0.0</b><span>صُمم بعناية لخدمة أصحاب الأعمال في ليبيا</span></footer>
+    <footer className="about-footer"><b>Dukkan v1.0.1</b><span>صُمم بعناية لخدمة أصحاب الأعمال في ليبيا</span></footer>
   </div>
 }
 
