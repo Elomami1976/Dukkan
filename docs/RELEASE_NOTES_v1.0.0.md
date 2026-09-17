@@ -23,4 +23,4 @@
 
 ## المطور
 
-طارق العمامي — Tarek Al-Emami
+طارق العمامي — Tarek Elomami

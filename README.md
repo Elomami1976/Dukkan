@@ -8,13 +8,13 @@
 
 الموقع العام: [elomami1976.github.io/Dukkan](https://elomami1976.github.io/Dukkan/)
 
-أحدث إصدار: [تنزيل Dukkan-Setup-1.0.1.exe](https://github.com/Elomami1976/Dukkan/releases/download/v1.0.1/Dukkan-Setup-1.0.1.exe) · [Release v1.0.1](https://github.com/Elomami1976/Dukkan/releases/tag/v1.0.1)
+أحدث إصدار: [تنزيل Dukkan-Setup-1.1.0.exe](https://github.com/Elomami1976/Dukkan/releases/download/v1.1.0/Dukkan-Setup-1.1.0.exe) · [Release v1.1.0](https://github.com/Elomami1976/Dukkan/releases/tag/v1.1.0)
 
 مصدر الموقع موجود في [`docs/`](docs/)، ويتم نشره عبر GitHub Pages من فرع `main`. زر التنزيل في الموقع يتحقق من وجود Windows Installer رسمي قبل تفعيله.
 
 ## حالة المشروع
 
-الإصدار `v1.0.1` منشور وجاهز لمستخدمي Windows. تم بناء Windows Installer بصيغة NSIS واختبار تثبيته وتشغيله على بيئة Windows نظيفة قبل النشر.
+الإصدار `v1.1.0` هو الإصدار الحالي لمستخدمي Windows. يُبنى Windows Installer بصيغة NSIS ويُختبر تثبيته وتشغيله على بيئة Windows نظيفة قبل النشر.
 
 ## For Users
 
@@ -97,5 +97,5 @@ npm run tauri build
 هذا المشروع مرخص بموجب MIT License — مناسب لمشروع مفتوح المصدر، مع الاحتفاظ بحقوق النسبة وإتاحة إعادة الاستخدام والتعديل بوضوح.
 
 إعداد وتطوير المشروع: **طارق العمامي**  
-Tarek Al-Emami  
+Tarek Elomami
 الإصدار الحالي: **قيد التطوير**

@@ -98,7 +98,7 @@ React UI
 ```text
 إعداد وتطوير المشروع:
 طارق العمامي
-Tarek Al-Emami
+Tarek Elomami
 ```
 
 ## مراحل التنفيذ
