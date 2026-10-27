@@ -15,6 +15,8 @@ build/
 *.log
 logs/
 coverage/
+test-results/
+playwright-report/
 *.lcov
 
 # Rust / SQLite runtime files

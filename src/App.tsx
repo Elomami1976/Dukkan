@@ -9,7 +9,8 @@ import {
 } from 'lucide-react'
 import { useAppStore, isAdmin } from './store'
 import { PasswordField } from './components/PasswordField'
-import { Dashboard, POS, Products, Inventory, Sales, Purchases, Customers, Suppliers, Expenses, Reports, UsersPage } from './components/BusinessPages'
+import { POS, Products, Inventory, Sales, Purchases, Customers, Suppliers, Expenses, Reports, UsersPage } from './components/BusinessPages'
+import { Dashboard } from './components/Dashboard'
 import { parseBackup, displayDate } from './lib/data'
 import { download } from './lib/output'
 import type { Business, Product } from './types'
@@ -152,6 +153,7 @@ function AuthScreen({ switchingUser = false }: { switchingUser?: boolean }) {
 }
 
 const helpArticles = [
+  { category: 'لوحة النشاط', title: 'كيف أقرأ لوحة النشاط الجديدة؟', steps: ['اختر فترة التقرير من اللوحة؛ المبيعات والمصروفات والدفعات تتبع هذه الفترة، بينما الديون والمخزون أرصدة حالية لجميع الفترات.', 'مجمل الربح هو المبيعات بعد الخصم ناقص تكلفة البضاعة المحفوظة عند البيع. نتيجة التشغيل تخصم المصروفات وخسائر الإتلاف أيضاً؛ الربح ليس النقد المتاح.', 'إذا كانت تفاصيل التكلفة القديمة ناقصة يظهر الربح غير متاح، ولا تُختلق أرقام بديلة.', 'المقارنة مع الفترة السابقة المساوية في عدد الأيام؛ نسبة النمو لا تحسب عندما تكون مبيعات الفترة السابقة صفراً.', 'استخدم الوضع البسيط للملخص السريع والمتقدم للمصروفات والمنتجات والمخزون والرؤى.', 'من تخصيص اختر قالب النشاط والمؤشرات والأقسام وترتيبها والفترة الافتراضية. تحفظ الإعدادات لهذا المستخدم على الجهاز ولا تدخل في نسخة المعاملات الاحتياطية.', 'تنبيهات المخزون والصلاحية والأرصدة تفتح الأقسام المرتبطة. لا يصف النظام الديون بالمتأخرة لأن تواريخ الاستحقاق غير مسجلة.', 'اللوحة للمدير فقط، وتعمل دون اتصال بالإنترنت.'] },
   { category: 'البداية', title: 'البدء وإعداد النشاط', steps: ['عند التشغيل الأول أدخل اسم النشاط ونوعه ورقم الهاتف والعنوان؛ الرقم الضريبي اختياري.', 'اختر اللون الرئيسي وأضف شعار المحل، ثم راجع العملة والخانات العشرية.', 'أنشئ حساب المدير بكلمة مرور قوية من 8 أحرف على الأقل، ثم احتفظ ببيانات الدخول في مكان آمن.', 'ابدأ بإضافة التصنيفات والمنتجات والموردين، وبعدها سجّل الكميات الافتتاحية أو المشتريات.'] },
   { category: 'الرئيسية', title: 'لوحة التحكم', steps: ['تعرض ملخص المبيعات والأرباح والفواتير وحالة المخزون.', 'استخدم تنبيهات المخزون لمعرفة الأصناف التي قاربت على النفاد.', 'إذا كنت تتتبع الصلاحية، راجع الدفعات المنتهية أو القريبة من الانتهاء والكمية والقيمة المعرضة للخطر.', 'راجع المؤشرات يوميًا، ثم افتح التقارير للحصول على تفاصيل أوسع.', 'زر «عملية بيع جديدة» ينقلك مباشرة إلى نقطة البيع.'] },
   { category: 'المبيعات', title: 'نقطة البيع وإنشاء فاتورة', steps: ['ابحث عن المنتج بالاسم أو SKU أو الباركود، ثم اضغط عليه لإضافته إلى السلة.', 'عدّل الكمية من السلة وتأكد من السعر والإجمالي قبل الحفظ.', 'اختر العميل عند البيع الآجل، وحدد طريقة الدفع والمبلغ المدفوع.', 'أكمل البيع؛ يحفظ النظام الفاتورة ويخصم الكميات من المخزون تلقائيًا.', 'إذا لم تكفِ الكمية، يمنع النظام بيع كمية أكبر من المتوفر.'] },
@@ -272,7 +274,7 @@ function LogoUpload({ value, onChange }: { value: string; onChange: (logo: strin
 function SetupWizard() {
   const { completeSetup } = useAppStore()
   const [step, setStep] = useState(1)
-  const [business, setBusiness] = useState<Business>({ name: '', type: 'متجر تجزئة', phone: '', address: '', taxNumber: '', logo: '', primaryColor: '#d99a2b', currency: 'الدينار الليبي' })
+  const [business, setBusiness] = useState<Business>({ name: '', type: 'متجر تجزئة', phone: '', address: '', taxNumber: '', logo: '', primaryColor: '#2563eb', currency: 'الدينار الليبي' })
   const [user, setUser] = useState({ name: '', username: 'admin', password: '', confirm: '' })
   const [error, setError] = useState(''), [busy, setBusy] = useState(false)
   const update = (key: keyof Business, value: string) => setBusiness(b => ({ ...b, [key]: value }))

@@ -7,6 +7,9 @@ const storageKey = 'dukkan-local-db-v1'
 let storageRevision = 0
 const tauriRuntime = () => typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
 const tauriApi = () => import('@tauri-apps/api/core')
+async function authenticateDashboard(username: string, password: string) {
+  if (tauriRuntime()) { const { invoke } = await tauriApi(); await invoke('dashboard_login', { username, password }) }
+}
 async function persistDesktop(data: Data, expectedRevision: number, revision: number) {
   const stateJson = JSON.stringify(data)
   const { invoke } = await tauriApi()
@@ -100,21 +103,23 @@ export const useAppStore = create<State>()((set, get) => {
       if (get().setupComplete) throw new Error('تم إعداد النشاط بالفعل')
       const year = new Date().getFullYear()
       await commit({ business: businessData(business), users: [user], activeUser: user.name, setupComplete: true, fiscalYears: [{ id: id('FY'), name: `السنة المالية ${year}`, startDate: `${year}-01-01`, endDate: `${year}-12-31`, status: 'open', createdAt: now() }] })
+      await authenticateDashboard(input.username, input.password)
       set({ sessionId: user.id })
     },
     createAdmin: async (name, username, password) => {
       if (get().users.length || !get().setupComplete) throw new Error('تم إنشاء حساب المدير بالفعل')
       const user = await newUser(name, username, password, 'admin')
       if (get().users.length) throw new Error('تم إنشاء حساب المدير بالفعل')
-      await commit({ users: [user], activeUser: user.name }); set({ sessionId: user.id })
+      await commit({ users: [user], activeUser: user.name }); await authenticateDashboard(username, password); set({ sessionId: user.id })
     },
     login: async (username, password) => {
       const user = get().users.find(u => u.username.toLowerCase() === username.trim().toLowerCase() && u.active)
       if (!user || !await verifyPassword(user, password)) throw new Error('اسم المستخدم أو كلمة المرور غير صحيحة')
       if (!get().users.some(u => u.id === user.id && u.active && u.hash === user.hash)) throw new Error('الحساب غير متاح')
+      await authenticateDashboard(username, password)
       set({ sessionId: user.id, activeUser: user.name })
     },
-    logout: () => set({ sessionId: null }),
+    logout: () => { set({ sessionId: null }); if (tauriRuntime()) void tauriApi().then(({ invoke }) => invoke('dashboard_logout')).catch(() => { /* No dashboard is rendered after logout. */ }) },
     addUser: async (name, username, password, role) => {
       access(true); const user = await newUser(name, username, password, role); access(true)
       if (get().users.some(u => u.username.toLowerCase() === user.username.toLowerCase())) throw new Error('اسم المستخدم موجود بالفعل')

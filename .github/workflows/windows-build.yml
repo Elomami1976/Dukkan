@@ -6,6 +6,12 @@ on:
     branches: [main]
     paths:
       - 'src/**'
+      - 'e2e/**'
+      - 'scripts/**'
+      - 'playwright.config.ts'
+      - 'eslint.config.mjs'
+      - 'tsconfig*.json'
+      - 'vitest.config.mjs'
       - 'src-tauri/**'
       - 'package*.json'
       - 'vite.config.mjs'
@@ -28,7 +34,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build frontend
-        run: npm run build
+        run: |
+          npm run lint
+          npm test
+          npm run test:migrations
+          npm run build
+      - name: Browser regression tests
+        run: |
+          npx playwright install chromium
+          npm run test:e2e
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Test native database and authorization
+        run: cargo test --manifest-path src-tauri/Cargo.toml
       - name: Build Tauri bundles
         run: npm run tauri build
       - name: Smoke test Windows installer

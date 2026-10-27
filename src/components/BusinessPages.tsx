@@ -42,21 +42,6 @@ function Receipt({ sale, close }: { sale: Sale | Purchase; close: () => void }) 
   return <Dialog title="تفاصيل الفاتورة" close={close}><p>{title}</p><Table headings={['البيان', 'القيمة']} rows={info} />{!sale.lines && <p className="form-error">الفاتورة القديمة لا تحتوي تفاصيل الأصناف.</p>}<Table headings={headings} rows={rows} /><button className="btn primary" onClick={() => void printInvoice(business, sale)}><Printer size={17} />طباعة الفاتورة</button></Dialog>
 }
 
-export function Dashboard({ onNavigate }: { onNavigate: (page: 'pos' | 'products' | 'purchases' | 'expenses') => void }) {
-  const s = useAppStore(), today = todayKey(), sales = s.sales.filter(s => dayKey(s.date) === today), expenses = s.expenses.filter(e => dayKey(e.date) === today).reduce((n, e) => n + e.amount, 0)
-  const metrics = inventoryMetrics(s.products, s.batches, today)
-  const profit = sales.every(s => s.lines) ? sum(sales) - sales.reduce((n, s) => n + s.lines!.reduce((v, l) => v + lineCost(l), 0), 0) - expenses : null
-  const low = s.products.filter(p => p.trackInventory && p.stock <= p.minStock)
-  const expiryBatches = s.batches.filter(batch => {
-    const product = s.products.find(p => p.id === batch.productId)
-    if (!product?.trackExpiry || !batch.expiryDate || !batch.quantity) return false
-    const days = Math.floor((Date.parse(batch.expiryDate) - Date.parse(today)) / 86400000)
-    return days <= product.expiryWarningDays
-  }).sort((a, b) => (a.expiryDate || '').localeCompare(b.expiryDate || ''))
-  const expiryRows = expiryBatches.map(batch => { const product = s.products.find(p => p.id === batch.productId)!; const days = Math.floor((Date.parse(batch.expiryDate!) - Date.parse(today)) / 86400000); return [product.name, batch.lotNumber, batch.quantity, days < 0 ? 'منتهي' : days === 0 ? 'ينتهي اليوم' : `متبقي ${days} يوم`, formatMoney(batch.quantity * batch.unitCost)] })
-  return <div className="page-content"><Summary items={[["مبيعات اليوم", formatMoney(sum(sales))], ['صافي ربح اليوم', profit === null ? 'تفاصيل ناقصة' : formatMoney(profit)], ['فواتير اليوم', sales.length], ['ديون العملاء', formatMoney(s.customers.reduce((n, c) => n + c.balance, 0))]]} /><div className="toolbar"><h2>آخر المبيعات</h2><button className="btn primary" onClick={() => onNavigate('pos')}><Plus size={18} />عملية بيع جديدة</button></div><Table headings={saleHead} rows={s.sales.slice(0, 10).map(saleRow)} /><h2>تنبيهات المخزون</h2><Table headings={['المنتج', 'الكمية', 'الحد الأدنى', 'الحالة']} rows={low.map(p => [p.name, p.stock, p.minStock, <Status status={p.stock ? 'منخفض' : 'نافد'} />])} /><h2>تنبيهات الصلاحية</h2><Summary items={[["الدفعات المتأثرة", expiryBatches.length], ['الكمية المعرضة للخطر', expiryBatches.reduce((n, b) => n + b.quantity, 0)], ['القيمة المعرضة للخطر', formatMoney(expiryBatches.reduce((n, b) => n + b.quantity * b.unitCost, 0))]]} /><Table headings={['المنتج', 'الدفعة', 'الكمية', 'الصلاحية', 'القيمة']} rows={expiryRows} /><Summary items={[["مستحقات الموردين", formatMoney(s.suppliers.reduce((n, p) => n + p.balance, 0))], ['مصروفات اليوم', formatMoney(expenses)], ['قيمة المخزون', formatMoney(s.products.filter(p => p.trackInventory).reduce((n, p) => n + (metrics.get(p.id)?.value || 0), 0))]]} /></div>
-}
-
 export function POS({ notify }: Notify) {
   const s = useAppStore(), [query, setQuery] = useState(''), [category, setCategory] = useState(''), [cart, setCart] = useState<{ productId: string; qty: number }[]>([]), [customer, setCustomer] = useState(''), [paid, setPaid] = useState(''), [discount, setDiscount] = useState(''), [method, setMethod] = useState('نقدي'), [error, setError] = useState(''), [receipt, setReceipt] = useState<Sale | null>(null)
   const metrics = inventoryMetrics(s.products, s.batches, todayKey())

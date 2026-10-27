@@ -15,3 +15,10 @@
 لا توجد تغييرات غير منشورة.
 - إضافة مخطط SQLite ومواصفات المشروع العربية.
 - إضافة توثيق المساهمة والأمان وقواعد السلوك.
+
+## Unreleased — Dashboard review candidate
+
+- Arabic soft-glass dashboard with exact millime analytics, historical batch costs, period comparisons, local charts and actionable insights.
+- Per-user layouts, business presets, simple/advanced modes, offline Arabic font and guide.
+- Native dashboard session checks, financial/permission regression tests and browser checks.
+- No transaction schema or backup-format change. Installer validation is required before publication.

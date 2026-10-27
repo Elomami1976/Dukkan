@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client'
 import App from './App'
 import './styles.css'
 import './layout.css'
+import './glass.css'
+import './fonts.css'
 import { initializeDesktopPersistence } from './store'
 
 void initializeDesktopPersistence().finally(() => {

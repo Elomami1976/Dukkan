@@ -7,7 +7,7 @@ export type Data = {
 }
 export const emptyData: Data = {
   setupComplete: false,
-  business: { name: '', type: 'متجر تجزئة', phone: '', address: '', taxNumber: '', logo: '', primaryColor: '#d99a2b', currency: 'الدينار الليبي' },
+  business: { name: '', type: 'متجر تجزئة', phone: '', address: '', taxNumber: '', logo: '', primaryColor: '#2563eb', currency: 'الدينار الليبي' },
   products: [], customers: [], suppliers: [], sales: [], expenses: [], purchases: [], movements: [], batches: [], inventoryLosses: [], supplierReturns: [], auditEvents: [], payments: [], users: [], fiscalYears: [],
   categories: ['مواد غذائية', 'مشروبات', 'منزلية', 'خدمات', 'أخرى'], activeUser: '', lastBackup: '',
 }

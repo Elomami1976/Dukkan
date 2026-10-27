@@ -99,3 +99,13 @@ npm run tauri build
 إعداد وتطوير المشروع: **طارق العمامي**  
 Tarek Elomami
 الإصدار الحالي: **قيد التطوير**
+
+## لوحة النشاط الجديدة — مرشح مراجعة محلي
+
+واجهة زجاجية خفيفة، تحليلات بالتكلفة التاريخية، فترات ومقارنات، رسوم محلية، تنبيهات عملية وتخصيص حسب المستخدم والنشاط، مع وضعين بسيط ومتقدم. [دليل عربي](docs/user-guide.html) · [تعريف الحسابات وحدود التنفيذ](docs/DASHBOARD_IMPLEMENTATION.md) · [ملاحظات المرشح](docs/RELEASE_NOTES_dashboard-preview.md). لا يُعلن هذا المرشح إصداراً إنتاجياً قبل اكتمال تحقق المثبت.
+
+التحقق: `npm run lint`، `npm run build`، `npm test`، `npm run test:e2e`، ثم `cargo +stable test --manifest-path src-tauri/Cargo.toml` وبناء Tauri.
+
+### متطلبات البناء المحلي لهذا المرشح
+
+استخدم Rust MSVC وMicrosoft C++ Build Tools الحديثة مع حزمة Desktop development with C++ وWindows SDK، وفق [متطلبات Tauri الرسمية](https://v2.tauri.app/start/prerequisites/). رابط Visual Studio 2015 الموجود محلياً لم يجتز ربط هذا المرشح؛ راجع سجل [التحقق](docs/QA_CHECKLIST.md). بعد تجهيز الأدوات شغّل الاختبارات ثم `npm run tauri build`. لا يوجد مثبت جديد متحقق منه في هذا التسليم.
