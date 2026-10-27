@@ -20,5 +20,6 @@
 - Passed: ESLint, TypeScript and production Vite build.
 - Passed: direct SQLite migration/reopen integrity and snapshot-preservation check using an in-memory fixture, without touching a business database.
 - Actual application screenshot: docs/assets/dashboard-glass-desktop.png, using explicitly labeled isolated test records.
-- Native tests and installer: BLOCKED. The installed Visual Studio 2015 linker failed with LNK1107 and LNK2019. The verified Microsoft Build Tools 2022 installer exited with code 1602. No new installer was produced; no native startup or installation was validated.
-- No release or website has been published.
+- Initial local attempt (superseded by successful CI validation): BLOCKED. The installed Visual Studio 2015 linker failed with LNK1107 and LNK2019. The verified Microsoft Build Tools 2022 installer exited with code 1602. No new installer was produced; no native startup or installation was validated.
+- Passed on Windows CI: frontend checks, browser tests, native database/authorization tests, NSIS build, automated install and launch smoke check.
+- Website and updated v1.1.0 installer published. [Build evidence](https://github.com/Elomami1976/Dukkan/actions/runs/40563018411). The unchecked manual checklist above remains unverified.
